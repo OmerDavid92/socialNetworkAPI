@@ -1,14 +1,15 @@
 let config = {
-    port: 5001,
+    port: 2718,
     usersPath: 'users.json',
     postsPath: 'posts.json',
-    massagesPath: 'massages.json',
+    messagesPath: 'messages.json',
     adminUser: {
         id: 1,
         name: 'Root',
-        password: '123',
+        password: '96cae35ce8a9b0244178bf28e4966c2ce1b8385723a96a6b838858cdd6ca0a1e',
         salt: '123',
-        status: 'active'
+        status: 'active',
+        realPass: '123'
     }
 }
 

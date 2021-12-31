@@ -1,68 +1,52 @@
 // External modules
 const express = require('express')
 const StatusCodes = require('http-status-codes').StatusCodes;
-const package = require('./package.json');
-const fs = require('fs');
 const STATUS = require('./user-status');
 const config = require('./config');
-const auth_token = require('./user-token'); 
-
-
-const usersPath = config.usersPath;
-const port = config.port;
-let g_users;
+const auth_token = require('./user-token');
+const { get_users_from_file, update_users } = require('./db-interface/users-db-interface'); 
 
 /////////////////////////////////////////////////////////////////////////////////
-function get_users_from_file (){
-	if (fs.existsSync(usersPath)){
-		g_users = fs.readFileSync(usersPath, {encoding:'utf8', flag:'r'});
-		g_users = JSON.parse(g_users);
-		g_users = g_users.g_users;
-	}
-}
 
-function list_users( req, res) 
-{
-	get_users_from_file();
+async function list_users( req, res) {
+	let g_users = await get_users_from_file();
 	console.log({g_users});
 	res.json({g_users});
-	
 }
 
-
-function update_status(req, res, from_status, to_status) {
-    const id =  parseInt( req.params.id );
-	get_users_from_file();
+async function update_status(req, res, from_status, to_status) {
+    const id = parseInt( req.params.id );
+	let g_users = await get_users_from_file();
+	console.log({g_users});
 
 	if ( id <= 0)
 	{
 		res.status( StatusCodes.BAD_REQUEST );
-		res.send( "Bad id given")
+		res.send( "Bad id given");
 		return;
 	}
 
-	const user =  g_users.find( user =>  user.id === id )
-	if (!user)
-	{
+	const user = g_users.find( user =>  user.id === id )
+	if (!user) {
 		res.status( StatusCodes.NOT_FOUND );
-		res.send( "No such user")
+		res.send( "No such user");
 		return;
 	}
 
-    if (user.status !== from_status){
+    if (user.status !== from_status) {
         res.status( StatusCodes.NOT_FOUND );
-		res.send( "ERROR")
+		res.send("ERROR")
 		return;
     }
 
     if (req.user.id !== config.adminUser.id){
-		res.status( StatusCodes.UNAUTHORIZED);
+		res.status( StatusCodes.NOT_FOUND);
 		res.send("Not authorized");
 		return;
 	}
 
     user.status = to_status;
-    fs.writeFileSync(usersPath, JSON.stringify({g_users}));
+    await update_users(g_users);
     res.json(user);
 }
 
@@ -75,13 +59,13 @@ function delete_post(req, res){}
 /////////////////////////////////////////////////////////////////////////////////
 const router = express.Router();
 
-router.get('/users', auth_token(req, res, nex), (req, res) => { list_users(req, res )  } )
-router.put('/approve/(:id)', auth_token(req, res, nex), (req, res) => { update_status(req, res, STATUS.created, STATUS.active )  } )
-router.put('/suspend/(:id)', auth_token(req, res, nex), (req, res) => { update_status(req, res, STATUS.active, STATUS.suspended )  } )
-router.put('/restore/(:id)', auth_token(req, res, nex), (req, res) => { update_status(req, res, STATUS.suspended, STATUS.active )  } )
-router.put('/delete/(:id)', auth_token(req, res, nex), (req, res) => { update_status(req, res, STATUS.active, STATUS.deleted )  } )
-router.post('/massage', auth_token(req, res, nex), (req, res) => { massage(req, res )  })
-router.post('/massage/(:id)', auth_token(req, res, nex), (req, res) => { massage_by_id(req, res )  })
-router.delete('/deletePost/(:id)', auth_token(req, res, nex), (req, res) => { delete_post(req, res )  })
+router.get('/users', (req, res, nex) => { auth_token(req, res, nex) }, (req, res) => { list_users(req, res )  } )
+router.put('/approve/(:id)', (req, res, nex) => { auth_token(req, res, nex) }, (req, res) => { update_status(req, res, STATUS.created, STATUS.active )  } )
+router.put('/suspend/(:id)', (req, res, nex) => { auth_token(req, res, nex) }, (req, res) => { update_status(req, res, STATUS.active, STATUS.suspended )  } )
+router.put('/restore/(:id)', (req, res, nex) => { auth_token(req, res, nex) }, (req, res) => { update_status(req, res, STATUS.suspended, STATUS.active )  } )
+router.put('/delete/(:id)', (req, res, nex) => { auth_token(req, res, nex) }, (req, res) => { update_status(req, res, STATUS.active, STATUS.deleted )  } )
+router.post('/massage', (req, res, nex) => { auth_token(req, res, nex) }, (req, res) => { massage(req, res )  })
+router.post('/massage/(:id)', (req, res, nex) => { auth_token(req, res, nex) }, (req, res) => { massage_by_id(req, res )  })
+router.delete('/deletePost/(:id)', (req, res, nex) => { auth_token(req, res, nex) }, (req, res) => { delete_post(req, res )  })
 
 module.exports = router;

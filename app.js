@@ -1,15 +1,21 @@
+const fs = require('fs');
 const express = require('express');
 const package = require('./package.json');
 const config = require('./config');
 const user_route = require('./users');
 const admin_route = require('./admin');
 const post_route = require('./posts');
-const massage_route = require('./massages');
+const massage_route = require('./messages');
 require('dotenv').config();
 
 const app = express();
-const usersPath = config.usersPath;
 const port = config.port;
+const usersPath = config.usersPath;
+
+let g_users = [ config.adminUser ];
+if (!fs.existsSync(usersPath)) {
+	fs.writeFileSync(usersPath, JSON.stringify({g_users}));
+}
 
 // General app settings
 const set_content_type = function (req, res, next) 

@@ -2,53 +2,26 @@
 const express = require('express')
 const StatusCodes = require('http-status-codes').StatusCodes;
 const package = require('./package.json');
-const fs = require('fs');
 const STATUS = require('./user-status');
 const config = require('./config');
 const jwt = require('jsonwebtoken');
 const auth_token = require('./user-token');
-const crypto = require('crypto-js');
-
-const usersPath = config.usersPath;
-const port = config.port;
-
-// User's table
-let g_users = [ config.adminUser ];
-if (!fs.existsSync(usersPath)){
-	fs.writeFileSync(usersPath, JSON.stringify({g_users}));
-}
+const crypto = require('crypto');
+const cryptojs = require('crypto-js');
+const { get_users_from_file, update_users } = require('./db-interface/users-db-interface');
 
 // API functions
-
-// Version 
-function get_version( req, res) 
-{
+function get_version( req, res) {
 	const version_obj = { version: package.version, description: package.description };
-	res.send(  JSON.stringify( version_obj) );   
+	res.send(JSON.stringify( version_obj));   
 }
 
-function get_users_from_file (){
-	if (fs.existsSync(usersPath)){
-		g_users = fs.readFileSync(usersPath, {encoding:'utf8', flag:'r'});
-		g_users = JSON.parse(g_users);
-		g_users = g_users.g_users;
-	}
-}
-
-function list_users(req, res) {
-	get_users_from_file();
-	console.log({ g_users });
-	res.json({ g_users });
-	
-}
-
-function login(req, res) {
-	get_users_from_file();
+async function login(req, res) {
 	const name = req.body.name;
 	const password = req.body.password;
-
+	let g_users = await get_users_from_file();
 	const user = g_users.find(user => user.name === name);
-	const enc_password = enc_pass(password, user.salt);
+	const { enc_password } = user ? enc_pass(password, user.salt) : { enc_password: null };
 
 	if (!user || user.password !== enc_password)
 	{
@@ -61,14 +34,13 @@ function login(req, res) {
 		return;
 	}
 
-	const access_token = jwt.sign({ name }, process.env.ACCESS_TOKEN);
+	const access_token = jwt.sign(user, process.env.ACCESS_TOKEN);
 	res.json({ access_token });
 }
 
-function get_user( req, res )
-{
+async function get_user( req, res ) {
 	const id =  parseInt( req.params.id );
-	get_users_from_file();
+	let g_users = await get_users_from_file();
 
 	if ( id <= 0)
 	{
@@ -95,11 +67,10 @@ function get_user( req, res )
 }
 
 
-function delete_user( req, res )
-{
-	get_users_from_file();
+async function delete_user( req, res ) {
 	const id =  parseInt( req.params.id );
 	let deleted_user;
+	let g_users = await get_users_from_file();
 
 	if ( id <= 0)
 	{
@@ -130,24 +101,24 @@ function delete_user( req, res )
 	}
 
 	deleted_user = g_users.splice( idx, 1 );
-	fs.writeFileSync(usersPath, JSON.stringify({g_users}));
+	await update_users(g_users);
 	res.json({ deleted_user });   
 }
 
-function enc_pass(password, salt = crypto.randomBytes(16).toString('hex')) {	
-	const enc_password = crypto.SHA256(password + salt);
+function enc_pass(password, salt = crypto.randomBytes(16).toString('hex')) {
+	console.log({password});
+	console.log({salt});
+	const enc_password = cryptojs.SHA256(password.toString() + salt.toString()).toString();
+	console.log({enc_password});
 
 	return { enc_password, salt };
-
 }
 
-function create_user( req, res )
-{
-	get_users_from_file();
+async function create_user(req, res) {
 	const name = req.body.name;
 	const email = req.body.email;
 	const password = req.body.password;
-	
+	let g_users = await get_users_from_file();
 	
 	if ( !name || !email || !password) {
 		res.status( StatusCodes.BAD_REQUEST );
@@ -159,23 +130,20 @@ function create_user( req, res )
 
 	// Find max id 
 	let max_id = 0;
-	g_users.forEach(
-		item => { max_id = Math.max( max_id, item.id) }
-	)
+	g_users.forEach(item => { max_id = Math.max( max_id, item.id) });
 
 	const new_id = max_id + 1;
 	let creation_date = new Date();
 	const new_user = { id: new_id , name, email, password: enc_password, salt, creation_date, status: STATUS.created};
 	
 	g_users.push(new_user);
-	fs.writeFileSync(usersPath, JSON.stringify({g_users}));
+	await update_users(g_users);
 	res.json(new_user);
 }
 
-function update_user( req, res )
-{
-	get_users_from_file();
+async function update_user( req, res ) {
 	const id =  parseInt( req.params.id );
+	let g_users = await get_users_from_file();
 
 	if ( id <= 0)
 	{
@@ -214,20 +182,18 @@ function update_user( req, res )
 		return;
 	}
 		
-
-	fs.writeFileSync(usersPath, JSON.stringify({g_users}));
+	await update_users(g_users);
 	res.json({user});   
 }
 
 // Routing
 const router = express.Router();
 
-
 router.post('/login', (req, res) => { login(req, res )  } )
 router.get('/version', (req, res) => { get_version(req, res )  } )
 router.post('/users', (req, res) => { create_user(req, res )  } )
-router.put('/user/(:id)', auth_token(req, res, nex), (req, res) => { update_user(req, res )  } )
-router.get('/user/(:id)', auth_token(req, res, nex), (req, res) => { get_user(req, res )  })
-router.delete('/user/(:id)', auth_token(req, res, nex), (req, res) => { delete_user(req, res )  })
+router.put('/user/(:id)', (req, res, nex) => { auth_token(req, res, nex) }, (req, res) => { update_user(req, res )  } )
+router.get('/user/(:id)', (req, res, nex) => { auth_token(req, res, nex) }, (req, res) => { get_user(req, res )  })
+router.delete('/user/(:id)', (req, res, nex) => { auth_token(req, res, nex) }, (req, res) => { delete_user(req, res )  })
 
 module.exports = router;
