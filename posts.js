@@ -5,6 +5,7 @@ const package = require('./package.json');
 const fs = require('fs');
 const STATUS = require('./user-status');
 const config = require('./config');
+const auth_token = require('./user-token');
 
 const usersPath = config.usersPath;
 const postsPath = config.postsPath;
@@ -37,7 +38,7 @@ function get_users_from_file (){
 function list_posts( req, res) 
 {
 	get_posts_from_file();
-	res.send(JSON.stringify({g_posts}));
+	res.json({g_posts});
 	
 }
 
@@ -58,7 +59,6 @@ function get_user_status_by_id(id){
 function create_post(req, res) {
 
     const text = req.body.text;
-    const creator_id = parseInt(req.body.creator_id);
     get_posts_from_file();
     
     
@@ -68,7 +68,7 @@ function create_post(req, res) {
 		return;
 	}
 
-    if (get_user_status_by_id(creator_id) !== STATUS.active) {
+    if (req.user.status !== STATUS.active) {
 		res.status( StatusCodes.BAD_REQUEST );
 		res.send( "Not an active user");
 		return;
@@ -82,15 +82,14 @@ function create_post(req, res) {
 
 	const new_id = max_id + 1;
 	let creation_date = new Date();
-	const new_post = { id: new_id , text, creation_date, creator_id};
+	const new_post = { id: new_id , text, creation_date, creator_id: req.user.id};
 	
 	g_posts.push( new_post  );
 	fs.writeFileSync(postsPath, JSON.stringify({g_posts}));
-	res.send(  JSON.stringify( new_post) );   
+	res.json(new_post);   
 }
 
 function delete_post(req, res) {
-    const user_id = parseInt(req.body.user_id);
     const post_id = parseInt(req.params.id);
     get_posts_from_file();
     const idx =  g_posts.findIndex( post =>  post.id === post_id )
@@ -102,15 +101,15 @@ function delete_post(req, res) {
 	}
     const post_creator = g_posts[idx].creator_id;
    
-    if (user_id !== post_creator && user_id!==1){
-        res.status( StatusCodes.NOT_FOUND );
-		res.send( "No permissions")
-		return;
+    if (req.user.id !== post_creator && req.user.id !== config.adminUser.id) {
+        res.status(StatusCodes.NOT_FOUND);
+        res.send("No permissions")
+        return;
     }
 
     let deleted_post = g_posts.splice( idx, 1 );
 	fs.writeFileSync(postsPath, JSON.stringify({g_posts}));
-	res.send(  JSON.stringify({deleted_post}));  
+	res.json({deleted_post});  
 }
 
 
@@ -119,8 +118,8 @@ function delete_post(req, res) {
 
 const router = express.Router();
 
-router.post('/post', (req, res) => { create_post(req, res )  } )
-router.get('/posts', (req, res) => { list_posts(req, res )  } )
-router.delete('/post/(:id)', (req, res) => { delete_post(req, res )  } )
+router.post('/post', auth_token(req, res, nex), (req, res) => { create_post(req, res )  } )
+router.get('/posts', auth_token(req, res, nex), (req, res) => { list_posts(req, res )  } )
+router.delete('/post/(:id)', auth_token(req, res, nex),  (req, res) => { delete_post(req, res )  } )
 
 module.exports = router;

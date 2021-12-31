@@ -4,6 +4,7 @@ const package = require('./package.json');
 const fs = require('fs');
 const STATUS = require('./user-status');
 const config = require('./config');
+const auth_token = require('./user-token');
 
 const usersPath = config.usersPath;
 const massagesPath = config.massagesPath;
@@ -35,7 +36,7 @@ function get_users_from_file (){
 function list_massages( req, res) 
 {
 	get_massages_from_file();
-	res.send(JSON.stringify({g_massages}));
+	res.json({g_massages});
 	
 }
 
@@ -54,7 +55,6 @@ function get_user_status_by_id(id){
 
 function create_massage(req, res) {
     const text = req.body.text;
-    const send_from = parseInt(req.body.send_from);
     const send_to = parseInt(req.body.send_to);
     
     
@@ -63,15 +63,14 @@ function create_massage(req, res) {
 		res.status( StatusCodes.BAD_REQUEST );
 		res.send( "Missing data in request");
 		return;
-	}
+    }
 
-    if (send_from!==1){
-       if ((get_user_status_by_id(send_from) !== STATUS.active &&
-        (get_user_status_by_id(send_to) !== STATUS.active))) {
-		res.status( StatusCodes.BAD_REQUEST );
-		res.send( "Not an active user");
-		return;
-       }
+
+    if (req.user !== STATUS.active &&
+        (get_user_status_by_id(send_to) !== STATUS.active)) {
+        res.status(StatusCodes.BAD_REQUEST);
+        res.send("Not an active user");
+        return;
     }
 
     // Find max id 
@@ -82,11 +81,12 @@ function create_massage(req, res) {
 
 	const new_id = max_id + 1;
 	let creation_date = new Date();
-	const new_massage = { id: new_id , text, creation_date, send_from, send_to};
+    const new_massage = { id: new_id, text, creation_date, send_from: req.user.id, send_to };
+    
 	
 	g_massages.push( new_massage  );
 	fs.writeFileSync(massagesPath, JSON.stringify({g_massages}));
-	res.send(  JSON.stringify( new_massage) );   
+	res.json(new_massage);   
 }
 
 function send_to_all(req, res ) {
@@ -105,7 +105,13 @@ function send_to_all(req, res ) {
 		res.status( StatusCodes.BAD_REQUEST );
 		res.send( "Missing data in request");
 		return;
-	}
+    }
+    
+    if (req.user.id !== config.adminUser.id) {
+        res.status( StatusCodes.UNAUTHORIZED);
+		res.send("Not authorized");
+        return;
+    }
 
     for (let i=0; i<g_users_length; i++){
         max_id = 0;
@@ -114,14 +120,14 @@ function send_to_all(req, res ) {
         )
         new_id = max_id + 1;
     	creation_date = new Date();
-    	new_massage = { id: new_id , text, creation_date, send_from: 1, send_to: g_users[i].id};
+    	new_massage = { id: new_id , text, creation_date, send_from: config.adminUser.id, send_to: g_users[i].id};
 	
     	g_massages.push( new_massage  );
         massage_array[i] = new_massage;
     }
 
     fs.writeFileSync(massagesPath, JSON.stringify({g_massages}));
-    res.send(  JSON.stringify( massage_array) );  
+    res.json({massage_array});  
 
 }
 
@@ -131,8 +137,8 @@ function send_to_all(req, res ) {
 
 const router = express.Router();
 
-router.post('/massage', (req, res) => { create_massage(req, res )  } )
-router.post('/massages', (req, res) => { send_to_all(req, res )  } )
+router.post('/massage', auth_token(req, res, nex), (req, res) => { create_massage(req, res )  } )
+router.post('/massages', auth_token(req, res, nex), (req, res) => { send_to_all(req, res )  } )
 
 
 module.exports = router;

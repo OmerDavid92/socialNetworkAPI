@@ -5,12 +5,15 @@ const package = require('./package.json');
 const fs = require('fs');
 const STATUS = require('./user-status');
 const config = require('./config');
+const jwt = require('jsonwebtoken');
+const auth_token = require('./user-token');
+const crypto = require('crypto-js');
 
 const usersPath = config.usersPath;
 const port = config.port;
 
 // User's table
-let g_users = [ {id:1, name: 'Root'} ];
+let g_users = [ config.adminUser ];
 if (!fs.existsSync(usersPath)){
 	fs.writeFileSync(usersPath, JSON.stringify({g_users}));
 }
@@ -32,12 +35,34 @@ function get_users_from_file (){
 	}
 }
 
-function list_users( req, res) 
-{
+function list_users(req, res) {
 	get_users_from_file();
-	console.log({g_users});
-	res.send(JSON.stringify({g_users}));
+	console.log({ g_users });
+	res.json({ g_users });
 	
+}
+
+function login(req, res) {
+	get_users_from_file();
+	const name = req.body.name;
+	const password = req.body.password;
+
+	const user = g_users.find(user => user.name === name);
+	const enc_password = enc_pass(password, user.salt);
+
+	if (!user || user.password !== enc_password)
+	{
+		res.send("Wrong username or password");
+		return;
+	}
+
+	if (user.status !== STATUS.active) {
+		res.send("Not an active user");
+		return;
+	}
+
+	const access_token = jwt.sign({ name }, process.env.ACCESS_TOKEN);
+	res.json({ access_token });
 }
 
 function get_user( req, res )
@@ -60,8 +85,15 @@ function get_user( req, res )
 		return;
 	}
 
-	res.send(  JSON.stringify( user) );   
+	if (req.user.id !== id){
+		res.status( StatusCodes.UNAUTHORIZED);
+		res.send("Not authorized");
+		return;
+	}
+
+	res.json(user);   
 }
+
 
 function delete_user( req, res )
 {
@@ -91,9 +123,22 @@ function delete_user( req, res )
 		return;
 	}
 
+	if (req.user.id !== id){
+		res.status( StatusCodes.UNAUTHORIZED);
+		res.send("Not authorized");
+		return;
+	}
+
 	deleted_user = g_users.splice( idx, 1 );
 	fs.writeFileSync(usersPath, JSON.stringify({g_users}));
-	res.send(  JSON.stringify({deleted_user}));   
+	res.json({ deleted_user });   
+}
+
+function enc_pass(password, salt = crypto.randomBytes(16).toString('hex')) {	
+	const enc_password = crypto.SHA256(password + salt);
+
+	return { enc_password, salt };
+
 }
 
 function create_user( req, res )
@@ -102,13 +147,15 @@ function create_user( req, res )
 	const name = req.body.name;
 	const email = req.body.email;
 	const password = req.body.password;
-
+	
+	
 	if ( !name || !email || !password) {
 		res.status( StatusCodes.BAD_REQUEST );
 		res.send( "Missing data in request");
 		return;
 	}
 
+	const { enc_password, salt } = enc_pass(password);
 
 	// Find max id 
 	let max_id = 0;
@@ -118,11 +165,11 @@ function create_user( req, res )
 
 	const new_id = max_id + 1;
 	let creation_date = new Date();
-	const new_user = { id: new_id , name, email, password, creation_date, status: STATUS.created};
+	const new_user = { id: new_id , name, email, password: enc_password, salt, creation_date, status: STATUS.created};
 	
-	g_users.push( new_user  );
+	g_users.push(new_user);
 	fs.writeFileSync(usersPath, JSON.stringify({g_users}));
-	res.send(  JSON.stringify( new_user) );   
+	res.json(new_user);
 }
 
 function update_user( req, res )
@@ -137,7 +184,7 @@ function update_user( req, res )
 		return;
 	}
 
-	const idx =  g_users.findIndex( user =>  user.id == id )
+	const idx =  g_users.findIndex( user =>  user.id === id )
 	if ( idx < 0 )
 	{
 		res.status( StatusCodes.NOT_FOUND );
@@ -161,17 +208,26 @@ function update_user( req, res )
 	user.email = email;
 	user.password = password;
 
+	if (req.user.id !== id){
+		res.status( StatusCodes.UNAUTHORIZED);
+		res.send("Not authorized");
+		return;
+	}
+		
+
 	fs.writeFileSync(usersPath, JSON.stringify({g_users}));
-	res.send(  JSON.stringify( {user}) );   
+	res.json({user});   
 }
 
 // Routing
 const router = express.Router();
 
+
+router.post('/login', (req, res) => { login(req, res )  } )
 router.get('/version', (req, res) => { get_version(req, res )  } )
 router.post('/users', (req, res) => { create_user(req, res )  } )
-router.put('/user/(:id)', (req, res) => { update_user(req, res )  } )
-router.get('/user/(:id)', (req, res) => { get_user(req, res )  })
-router.delete('/user/(:id)', (req, res) => { delete_user(req, res )  })
+router.put('/user/(:id)', auth_token(req, res, nex), (req, res) => { update_user(req, res )  } )
+router.get('/user/(:id)', auth_token(req, res, nex), (req, res) => { get_user(req, res )  })
+router.delete('/user/(:id)', auth_token(req, res, nex), (req, res) => { delete_user(req, res )  })
 
 module.exports = router;

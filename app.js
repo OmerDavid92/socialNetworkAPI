@@ -5,6 +5,7 @@ const user_route = require('./users');
 const admin_route = require('./admin');
 const post_route = require('./posts');
 const massage_route = require('./massages');
+require('dotenv').config();
 
 const app = express();
 const usersPath = config.usersPath;

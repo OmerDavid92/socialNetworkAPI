@@ -5,6 +5,8 @@ const package = require('./package.json');
 const fs = require('fs');
 const STATUS = require('./user-status');
 const config = require('./config');
+const auth_token = require('./user-token'); 
+
 
 const usersPath = config.usersPath;
 const port = config.port;
@@ -23,7 +25,7 @@ function list_users( req, res)
 {
 	get_users_from_file();
 	console.log({g_users});
-	res.send(JSON.stringify({g_users}));
+	res.json({g_users});
 	
 }
 
@@ -39,7 +41,7 @@ function update_status(req, res, from_status, to_status) {
 		return;
 	}
 
-	const user =  g_users.find( user =>  user.id == id )
+	const user =  g_users.find( user =>  user.id === id )
 	if (!user)
 	{
 		res.status( StatusCodes.NOT_FOUND );
@@ -53,9 +55,15 @@ function update_status(req, res, from_status, to_status) {
 		return;
     }
 
+    if (req.user.id !== config.adminUser.id){
+		res.status( StatusCodes.UNAUTHORIZED);
+		res.send("Not authorized");
+		return;
+	}
+
     user.status = to_status;
     fs.writeFileSync(usersPath, JSON.stringify({g_users}));
-    res.send(JSON.stringify(user));
+    res.json(user);
 }
 
 
@@ -67,13 +75,13 @@ function delete_post(req, res){}
 /////////////////////////////////////////////////////////////////////////////////
 const router = express.Router();
 
-router.get('/users', (req, res) => { list_users(req, res )  } )
-router.put('/approve/(:id)', (req, res) => { update_status(req, res, STATUS.created, STATUS.active )  } )
-router.put('/suspend/(:id)', (req, res) => { update_status(req, res, STATUS.active, STATUS.suspended )  } )
-router.put('/restore/(:id)', (req, res) => { update_status(req, res, STATUS.suspended, STATUS.active )  } )
-router.put('/delete/(:id)', (req, res) => { update_status(req, res, STATUS.active, STATUS.deleted )  } )
-router.post('/massage', (req, res) => { massage(req, res )  })
-router.post('/massage/(:id)', (req, res) => { massage_by_id(req, res )  })
-router.delete('/deletePost/(:id)', (req, res) => { delete_post(req, res )  })
+router.get('/users', auth_token(req, res, nex), (req, res) => { list_users(req, res )  } )
+router.put('/approve/(:id)', auth_token(req, res, nex), (req, res) => { update_status(req, res, STATUS.created, STATUS.active )  } )
+router.put('/suspend/(:id)', auth_token(req, res, nex), (req, res) => { update_status(req, res, STATUS.active, STATUS.suspended )  } )
+router.put('/restore/(:id)', auth_token(req, res, nex), (req, res) => { update_status(req, res, STATUS.suspended, STATUS.active )  } )
+router.put('/delete/(:id)', auth_token(req, res, nex), (req, res) => { update_status(req, res, STATUS.active, STATUS.deleted )  } )
+router.post('/massage', auth_token(req, res, nex), (req, res) => { massage(req, res )  })
+router.post('/massage/(:id)', auth_token(req, res, nex), (req, res) => { massage_by_id(req, res )  })
+router.delete('/deletePost/(:id)', auth_token(req, res, nex), (req, res) => { delete_post(req, res )  })
 
 module.exports = router;
