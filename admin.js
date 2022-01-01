@@ -48,22 +48,13 @@ async function update_status(req, res, from_status, to_status) {
     res.json(user);
 }
 
-
-function massage(req, res){}
-function massage_by_id(req, res){}
-function delete_post(req, res){}
-
-
 /////////////////////////////////////////////////////////////////////////////////
 const router = express.Router();
 
 router.get('/users', (req, res, nex) => { auth_token(req, res, nex) }, (req, res) => { list_users(req, res )  } )
-router.put('/approve/(:id)', (req, res, nex) => { auth_token(req, res, nex) }, (req, res) => { update_status(req, res, STATUS.created, STATUS.active )  } )
-router.put('/suspend/(:id)', (req, res, nex) => { auth_token(req, res, nex) }, (req, res) => { update_status(req, res, STATUS.active, STATUS.suspended )  } )
-router.put('/restore/(:id)', (req, res, nex) => { auth_token(req, res, nex) }, (req, res) => { update_status(req, res, STATUS.suspended, STATUS.active )  } )
-router.put('/delete/(:id)', (req, res, nex) => { auth_token(req, res, nex) }, (req, res) => { update_status(req, res, STATUS.active, STATUS.deleted )  } )
-router.post('/massage', (req, res, nex) => { auth_token(req, res, nex) }, (req, res) => { massage(req, res )  })
-router.post('/massage/(:id)', (req, res, nex) => { auth_token(req, res, nex) }, (req, res) => { massage_by_id(req, res )  })
-router.delete('/deletePost/(:id)', (req, res, nex) => { auth_token(req, res, nex) }, (req, res) => { delete_post(req, res )  })
+router.put('/approve/(:id)', (req, res, nex) => { auth_token(req, res, nex) }, (req, res) => { update_status(req, res, STATUS.created, STATUS.active) } )
+router.put('/suspend/(:id)', (req, res, nex) => { auth_token(req, res, nex) }, (req, res) => { update_status(req, res, STATUS.active, STATUS.suspended) } )
+router.put('/restore/(:id)', (req, res, nex) => { auth_token(req, res, nex) }, (req, res) => { update_status(req, res, STATUS.suspended, STATUS.active) } )
+router.put('/delete/(:id)', (req, res, nex) => { auth_token(req, res, nex) }, (req, res) => { update_status(req, res, STATUS.active, STATUS.deleted) } )
 
 module.exports = router;
