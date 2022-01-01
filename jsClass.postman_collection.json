@@ -1,0 +1,773 @@
+{
+	"info": {
+		"_postman_id": "e244e9fa-3509-49e0-834a-875f5eebd37b",
+		"name": "jsClass",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "signup user1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"user1 should be created succesfuly\", () => {\r",
+							"    let jsonRes = pm.response.json();\r",
+							"    pm.expect(jsonRes).to.have.ownProperty('id');\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.environment.set(\"id1\", jsonRes.id);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let date = Date.now();\r",
+							"pm.environment.set(\"name1\", `username${date.toString()}`);\r",
+							"pm.environment.set(\"email1\", `email${date.toString()}@gmail.com`);\r",
+							"pm.environment.set(\"password1\", \"123456\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"{{name1}}\",\r\n    \"email\": \"{{email1}}\",\r\n    \"password\": \"{{password1}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:2718/api/users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2718",
+					"path": [
+						"api",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "login with Admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"should login succesfuly with Admin\", () => {\r",
+							"    let jsonRes = pm.response.json();\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.expect(jsonRes).to.have.ownProperty('token');\r",
+							"    pm.environment.set(\"adminToken\", jsonRes.token);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"adminName\", \"Root\");\r",
+							"pm.environment.set(\"adminEmail\", \"root@gmail.com\");\r",
+							"pm.environment.set(\"adminPass\", \"123\");\r",
+							"pm.environment.set(\"adminId\", 1);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"{{adminEmail}}\",\r\n    \"password\": \"{{adminPass}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:2718/api/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2718",
+					"path": [
+						"api",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "approve user1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"user1 should bew in status active\", () => {\r",
+							"    let jsonRes = pm.response.json();\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.expect(jsonRes).to.have.ownProperty('status');\r",
+							"    pm.expect(jsonRes.status).to.equal('active');\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{adminToken}}",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:2718/admin/approve/{{id1}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2718",
+					"path": [
+						"admin",
+						"approve",
+						"{{id1}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "login with user1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"should login succesfuly with user1\", () => {\r",
+							"    let jsonRes = pm.response.json();\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.expect(jsonRes).to.have.ownProperty('token');\r",
+							"    pm.environment.set(\"user1Token\", jsonRes.token);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"{{email1}}\",\r\n    \"password\": \"{{password1}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:2718/api/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2718",
+					"path": [
+						"api",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "send message from user1 to admin",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"message1\", \"This is my first message!\");"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"user1 should be able to send a message to admin\", () => {\r",
+							"    let jsonRes = pm.response.json();\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.expect(jsonRes).to.have.ownProperty('id');\r",
+							"    pm.environment.set(\"message1id\", jsonRes.id);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{user1Token}}",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"send_to\": {{adminId}},\r\n    \"text\": \"{{message1}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:2718/api/message",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2718",
+					"path": [
+						"api",
+						"message"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create post with user1",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"post1\", \"testing PostsoP!\");\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"user1 should be able to create new post1\", () => {\r",
+							"    let jsonRes = pm.response.json();\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.expect(jsonRes).to.have.ownProperty('id');\r",
+							"    pm.environment.set(\"post1id\", jsonRes.id);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{user1Token}}",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"text\": \"{{post1}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:2718/api/post",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2718",
+					"path": [
+						"api",
+						"post"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create post with Admin",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"post2\", \"testing ANOTHER PostsoP!\");\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"admin should be able to create new post2\", () => {\r",
+							"    let jsonRes = pm.response.json();\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.expect(jsonRes).to.have.ownProperty('id');\r",
+							"    pm.environment.set(\"post2id\", jsonRes.id);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{adminToken}}",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"text\": \"{{post2}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:2718/api/post",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2718",
+					"path": [
+						"api",
+						"post"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get all posts with user1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"user1 should get all posts\", () => {\r",
+							"    let jsonRes = pm.response.json();\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.expect(jsonRes).to.have.ownProperty('g_posts');\r",
+							"    pm.expect(jsonRes.g_posts.length).to.be.greaterThan(1);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{user1Token}}",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:2718/api/posts",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2718",
+					"path": [
+						"api",
+						"posts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete post1 with user1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"user1 should be able to delete post1\", () => {\r",
+							"    let jsonRes = pm.response.json();\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.expect(jsonRes).to.have.ownProperty('deleted_post');\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{user1Token}}",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:2718/api/post/{{post1id}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2718",
+					"path": [
+						"api",
+						"post",
+						"{{post1id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete post2 with user1 - should fail",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"user1 shouldn't be able to delete post2\", () => {\r",
+							"    pm.response.to.have.status(403);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{user1Token}}",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:2718/api/post/{{post2id}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2718",
+					"path": [
+						"api",
+						"post",
+						"{{post2id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "suspend user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"admin should be able to suspend user1\", () => {\r",
+							"    let jsonRes = pm.response.json();\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.expect(jsonRes).to.have.ownProperty('id');\r",
+							"    pm.expect(jsonRes).to.have.ownProperty('status');\r",
+							"    pm.expect(jsonRes.status).to.equal('suspended');\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{adminToken}}",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:2718/admin/suspend/{{id1}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2718",
+					"path": [
+						"admin",
+						"suspend",
+						"{{id1}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "login with suspended user1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"user shouldn't be able to login\", () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.expect(pm.response.text()).to.equal(\"Not an active user\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"{{email1}}\",\r\n    \"password\": \"{{password1}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:2718/api/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2718",
+					"path": [
+						"api",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "signup user1 Again",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"user shouldn't be created, already exists\", () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.expect(pm.response.text()).to.equal(\"This username or email is already exists\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"{{name1}}\",\r\n    \"email\": \"{{email1}}\",\r\n    \"password\": \"{{password1}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:2718/api/users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2718",
+					"path": [
+						"api",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "signup user2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"user2 should be created succesfuly\", () => {\r",
+							"    let jsonRes = pm.response.json();\r",
+							"    pm.expect(jsonRes).to.have.ownProperty('id');\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.environment.set(\"id2\", jsonRes.id);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let date = Date.now();\r",
+							"pm.environment.set(\"name2\", \"username\" + date.toString());\r",
+							"pm.environment.set(\"email2\", `email${date.toString()}@gmail.com`);\r",
+							"pm.environment.set(\"password2\", \"123456\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"{{name2}}\",\r\n    \"email\": \"{{email2}}\",\r\n    \"password\": \"{{password2}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:2718/api/users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2718",
+					"path": [
+						"api",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "send message to All users",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"admin should be able to send a message to all users\", () => {\r",
+							"    let jsonRes = pm.response.json();\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.expect(jsonRes).to.have.ownProperty('message_array');\r",
+							"    pm.expect(jsonRes.message_array.length).to.greaterThan(1);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{adminToken}}",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"text\": \"GGGGGGGGGGGG\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:2718/api/messages",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2718",
+					"path": [
+						"api",
+						"messages"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
