@@ -441,7 +441,7 @@
 							"pm.test(\"user1 should be able to delete post1\", () => {\r",
 							"    let jsonRes = pm.response.json();\r",
 							"    pm.response.to.have.status(200);\r",
-							"    pm.expect(jsonRes).to.have.ownProperty('deleted_post');\r",
+							"    pm.expect(jsonRes).to.have.ownProperty('creator_id');\r",
 							"});"
 						],
 						"type": "text/javascript"
