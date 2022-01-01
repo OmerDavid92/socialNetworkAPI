@@ -60,6 +60,7 @@ async function get_user(req, res) {
 		return;
 	}
 
+	user = {id: user.id, name: user.name, email: user.email, status: user.status};
 	res.json(user);   
 }
 
@@ -99,7 +100,8 @@ async function delete_user( req, res ) {
 
 	deleted_user = g_users.splice( idx, 1 );
 	await update_users(g_users);
-	res.json({ deleted_user });   
+	deleted_user = {id: deleted_user.id, name: deleted_user.name, email: deleted_user.email, status: deleted_user.status};
+	res.json(deleted_user);   
 }
 
 function enc_pass(password, salt = crypto.randomBytes(16).toString('hex')) {
@@ -130,10 +132,11 @@ async function create_user(req, res) {
 
 	const new_id = max_id + 1;
 	let creation_date = new Date();
-	const new_user = { id: new_id , name, email, password: enc_password, salt, creation_date, status: STATUS.created};
+	let new_user = { id: new_id , name, email, password: enc_password, salt, creation_date, status: STATUS.created};
 	
 	g_users.push(new_user);
 	await update_users(g_users);
+	new_user = {id: new_user.id, name: new_user.name, email: new_user.email, status: new_user.status};
 	res.json(new_user);
 }
 
@@ -178,6 +181,7 @@ async function update_user( req, res ) {
 	}
 		
 	await update_users(g_users);
+	user = {id: user.id, name: user.name, email: user.email, status: user.status};
 	res.json({user});   
 }
 

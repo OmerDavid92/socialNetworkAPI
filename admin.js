@@ -10,6 +10,7 @@ const { get_users_from_file, update_users } = require('./db-interface/users-db-i
 
 async function list_users( req, res) {
 	let g_users = await get_users_from_file();
+	g_users = g_users.map(user => { return {id: user.id, name: user.name, email: user.email, status: user.status}});
 	res.json({g_users});
 }
 
@@ -24,7 +25,7 @@ async function update_status(req, res, from_status, to_status) {
 		return;
 	}
 
-	const user = g_users.find( user =>  user.id === id )
+	let user = g_users.find( user =>  user.id === id )
 	if (!user) {
 		res.status( StatusCodes.NOT_FOUND );
 		res.send( "No such user");
@@ -45,6 +46,7 @@ async function update_status(req, res, from_status, to_status) {
 
     user.status = to_status;
     await update_users(g_users);
+	user = {id: user.id, name: user.name, email: user.email, status: user.status};
     res.json(user);
 }
 

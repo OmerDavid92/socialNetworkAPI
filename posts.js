@@ -61,9 +61,9 @@ async function delete_post(req, res) {
         return;
     }
 
-    let deleted_post = g_posts.splice( idx, 1 );
+    let deleted_post = g_posts.splice( idx, 1 )[0];
 	await update_posts(g_posts);
-	res.json({deleted_post});  
+	res.json(deleted_post);  
 }
 
 /////////////////////////////////////////////////////////////////
