@@ -19,7 +19,6 @@ async function create_message(req, res) {
     let g_messages = await get_messages_from_file();
     
     if ( !text ) {
-        console.log({text});
 		res.status( StatusCodes.BAD_REQUEST );
 		res.send( "Missing data in request");
 		return;
@@ -57,7 +56,6 @@ async function send_to_all(req, res ) {
     let max_id;
 
     if (!text) {
-        console.log({text});
 		res.status( StatusCodes.BAD_REQUEST );
 		res.send( "Missing data in request");
 		return;
@@ -81,7 +79,7 @@ async function send_to_all(req, res ) {
         message_array[i] = new_message;
     }
 
-    await update_messages(new_message);
+    await update_messages(g_messages);
     res.json({message_array});  
 }
 

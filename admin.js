@@ -10,14 +10,12 @@ const { get_users_from_file, update_users } = require('./db-interface/users-db-i
 
 async function list_users( req, res) {
 	let g_users = await get_users_from_file();
-	console.log({g_users});
 	res.json({g_users});
 }
 
 async function update_status(req, res, from_status, to_status) {
     const id = parseInt( req.params.id );
 	let g_users = await get_users_from_file();
-	console.log({g_users});
 
 	if ( id <= 0)
 	{

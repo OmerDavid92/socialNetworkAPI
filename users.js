@@ -11,21 +11,20 @@ const cryptojs = require('crypto-js');
 const { get_users_from_file, update_users } = require('./db-interface/users-db-interface');
 
 // API functions
-function get_version( req, res) {
+function get_version(req, res) {
 	const version_obj = { version: package.version, description: package.description };
 	res.send(JSON.stringify( version_obj));   
 }
 
 async function login(req, res) {
-	const name = req.body.name;
+	const email = req.body.email;
 	const password = req.body.password;
 	let g_users = await get_users_from_file();
-	const user = g_users.find(user => user.name === name);
+	const user = g_users.find(user => user.email === email);
 	const { enc_password } = user ? enc_pass(password, user.salt) : { enc_password: null };
 
-	if (!user || user.password !== enc_password)
-	{
-		res.send("Wrong username or password");
+	if (!user || user.password !== enc_password) {
+		res.send("Wrong email or password");
 		return;
 	}
 
@@ -34,30 +33,28 @@ async function login(req, res) {
 		return;
 	}
 
-	const access_token = jwt.sign(user, process.env.ACCESS_TOKEN);
-	res.json({ access_token });
+	const token = jwt.sign(user, process.env.ACCESS_TOKEN);
+	res.json({ token });
 }
 
-async function get_user( req, res ) {
+async function get_user(req, res) {
 	const id =  parseInt( req.params.id );
 	let g_users = await get_users_from_file();
 
-	if ( id <= 0)
-	{
+	if ( id <= 0) {
 		res.status( StatusCodes.BAD_REQUEST );
 		res.send( "Bad id given")
 		return;
 	}
 
-	const user =  g_users.find( user =>  user.id == id )
-	if ( !user)
-	{
+	const user = g_users.find(user =>  user.id == id )
+	if (!user) {
 		res.status( StatusCodes.NOT_FOUND );
 		res.send( "No such user")
 		return;
 	}
 
-	if (req.user.id !== id){
+	if (req.user.id !== id) {
 		res.status( StatusCodes.UNAUTHORIZED);
 		res.send("Not authorized");
 		return;
@@ -74,28 +71,28 @@ async function delete_user( req, res ) {
 
 	if ( id <= 0)
 	{
-		res.status( StatusCodes.BAD_REQUEST );
-		res.send( "Bad id given")
+		res.status(StatusCodes.BAD_REQUEST);
+		res.send("Bad id given")
 		return;
 	}
 
 	if ( id == 1)
 	{
-		res.status( StatusCodes.FORBIDDEN ); // Forbidden
-		res.send( "Can't delete root user")
+		res.status(StatusCodes.FORBIDDEN);
+		res.send("Can't delete root user")
 		return;		
 	}
 
-	const idx =  g_users.findIndex( user =>  user.id == id )
+	const idx = g_users.findIndex( user =>  user.id == id )
 	if ( idx < 0 )
 	{
-		res.status( StatusCodes.NOT_FOUND );
+		res.status(StatusCodes.NOT_FOUND);
 		res.send( "No such user")
 		return;
 	}
 
 	if (req.user.id !== id){
-		res.status( StatusCodes.UNAUTHORIZED);
+		res.status(StatusCodes.UNAUTHORIZED);
 		res.send("Not authorized");
 		return;
 	}
@@ -106,10 +103,7 @@ async function delete_user( req, res ) {
 }
 
 function enc_pass(password, salt = crypto.randomBytes(16).toString('hex')) {
-	console.log({password});
-	console.log({salt});
 	const enc_password = cryptojs.SHA256(password.toString() + salt.toString()).toString();
-	console.log({enc_password});
 
 	return { enc_password, salt };
 }
@@ -119,16 +113,18 @@ async function create_user(req, res) {
 	const email = req.body.email;
 	const password = req.body.password;
 	let g_users = await get_users_from_file();
+	let isEmailExists = g_users.some(user => user.email === email);
 	
 	if ( !name || !email || !password) {
-		res.status( StatusCodes.BAD_REQUEST );
-		res.send( "Missing data in request");
-		return;
+		res.status(StatusCodes.BAD_REQUEST);
+		return res.send("Missing data in request");
+	}
+
+	if(isEmailExists) {
+		return res.send("This username or email is already exists");
 	}
 
 	const { enc_password, salt } = enc_pass(password);
-
-	// Find max id 
 	let max_id = 0;
 	g_users.forEach(item => { max_id = Math.max( max_id, item.id) });
 
@@ -145,16 +141,15 @@ async function update_user( req, res ) {
 	const id =  parseInt( req.params.id );
 	let g_users = await get_users_from_file();
 
-	if ( id <= 0)
-	{
+	if (id <= 0) {
 		res.status( StatusCodes.BAD_REQUEST );
 		res.send( "Bad id given")
 		return;
 	}
 
-	const idx =  g_users.findIndex( user =>  user.id === id )
-	if ( idx < 0 )
-	{
+	const idx = g_users.findIndex(user =>  user.id === id);
+
+	if (idx < 0) {
 		res.status( StatusCodes.NOT_FOUND );
 		res.send( "No such user")
 		return;
@@ -177,7 +172,7 @@ async function update_user( req, res ) {
 	user.password = password;
 
 	if (req.user.id !== id){
-		res.status( StatusCodes.UNAUTHORIZED);
+		res.status(StatusCodes.UNAUTHORIZED);
 		res.send("Not authorized");
 		return;
 	}

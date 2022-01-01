@@ -40,7 +40,7 @@ async function create_post(req, res) {
 	
 	g_posts.push(new_post);
 	await update_posts(g_posts);
-	res.json(new_post);   
+	res.json({id: new_id});   
 }
 
 async function delete_post(req, res) {
@@ -56,7 +56,7 @@ async function delete_post(req, res) {
     const post_creator = g_posts[idx].creator_id;
    
     if (req.user.id !== post_creator && req.user.id !== config.adminUser.id) {
-        res.status(StatusCodes.NOT_FOUND);
+        res.status(StatusCodes.FORBIDDEN);
         res.send("No permissions")
         return;
     }

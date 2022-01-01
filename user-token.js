@@ -10,7 +10,7 @@ function auth_token(req, res, nex){
         if(err) return res.sendStatus(403);        
         req.user = await get_user_by_id(user.id);
         if(!req.user) return res.sendStatus(401);
-        console.log({user: req.user});
+        //console.log({user: req.user});
         nex();
     })
 }
