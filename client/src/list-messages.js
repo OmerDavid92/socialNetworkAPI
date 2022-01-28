@@ -33,8 +33,8 @@ export default class ListMessages extends React.Component {
     render() {
         return <div className='list-massages'>
                 {
-                    this.state.messages_array.map(item => {
-                        return <Message sendFrom={item.send_from} sendTo={item.send_to} creationDate={item.creation_date} text={item.text}></Message>
+                    this.state.messages_array.map((item, index) => {
+                        return <Message key={index} sendFrom={item.send_from} sendTo={item.send_to} creationDate={item.creation_date} text={item.text}></Message>
                     })
                 }
 				</div>

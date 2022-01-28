@@ -32,8 +32,8 @@ export default class ListPosts extends React.Component {
     render() {
         return <div className='lists-posts'>
                 {
-                    this.state.g_posts.map(item => {
-                        return <Post name={item.creator_id} creationDate={item.creation_date} text={item.text}></Post>
+                    this.state.g_posts.map((item, index) => {
+                        return <Post key={index} name={item.creator_id} creationDate={item.creation_date} text={item.text}></Post>
                     })
                 }
 				</div>

@@ -1,4 +1,5 @@
 const fs = require('fs');
+const cors = require('cors');
 const express = require('express');
 const package = require('./package.json');
 const config = require('./config');
@@ -24,6 +25,8 @@ const set_content_type = function (req, res, next)
 	next()
 }
 
+app.use(cors());
+app.options('*', cors());
 app.use( set_content_type );
 app.use(express.json());  // to support JSON-encoded bodies
 app.use(express.urlencoded( // to support URL-encoded bodies
