@@ -26,19 +26,19 @@ export default class Login extends React.Component
     }
 
 
-	handle_click() {
-        let data = { email: this.state.email, password: this.state.pass }
+	async handle_click() {
+        let data = { email: this.state.email, password: this.state.pass };
         console.log({state: this.state})
 		let res = await fetch("http://localhost:2718/api/login", {
             method: 'POST', 
             headers: {
             'Content-Type': 'application/json'
             },
-            body: JSON.stringify(data) 
+            body: JSON.stringify(data)
         });
         if (res.status != 200) throw new Error('Error while login');
-        const data = await res.json();
-        if (data.token); // To save in a cookie
+        res = await res.json();
+       // if (res.token){ console.log(token) }; // To save in a cookie
 	}
 
 	render() {
