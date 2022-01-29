@@ -22,7 +22,7 @@ export default class TheGodFather extends React.Component {
         };
 
         this.loginToSignup = this.loginToSignup.bind(this);
-        this.signupToLogin = this.signupToLogin.bind(this);
+        this.toLogin = this.toLogin.bind(this);
         this.toMessages = this.toMessages.bind(this);
         this.toHomepage = this.toHomepage.bind(this);
         this.toAbout = this.toAbout.bind(this);
@@ -36,10 +36,15 @@ export default class TheGodFather extends React.Component {
         this.setState(new_state);
     }
     
-    signupToLogin() {
+    toLogin() {
         let new_state = { ...this.state };
         new_state.login = true;
         new_state.signup = false;
+        new_state.listPosts = false;
+        new_state.about = false;
+        new_state.admin = false;
+        new_state.listMessages = false;
+        new_state.navbar = false;
         this.setState(new_state);
     }
     
@@ -90,7 +95,7 @@ export default class TheGodFather extends React.Component {
         return <div className='theGodFather'>
             {this.state.login ? <Login  loginToSignup={this.loginToSignup} toHomepage={this.toHomepage} ></Login>: null}
             {this.state.signup ? <Signup signupToHomepage={this.toHomepage}></Signup>: null}
-            {this.state.navbar ? <Navbar toHomepage={this.toHomepage} toMessages={this.toMessages} toAbout={this.toAbout} ></Navbar>: null}
+            {this.state.navbar ? <Navbar toHomepage={this.toHomepage} toMessages={this.toMessages} toAbout={this.toAbout} logout={this.toLogin} ></Navbar>: null}
             {this.state.admin ? <Admin></Admin>: null}
             {this.state.about ? <About></About>: null}
             {this.state.listPosts ? <ListPosts></ListPosts>: null}

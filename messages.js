@@ -3,14 +3,21 @@ const StatusCodes = require('http-status-codes').StatusCodes;
 const STATUS = require('./user-status');
 const config = require('./config');
 const auth_token = require('./user-token');
-const { get_users_from_file, get_user_status_by_id } = require('./db-interface/users-db-interface');
+const { get_users_from_file, get_user_status_by_id, get_user_by_id } = require('./db-interface/users-db-interface');
 const { get_messages_from_file, update_messages } = require('./db-interface/messages-db-interface');
 
 /////////////////////////////////////////////////////////////////
 
 async function list_messages( req, res) {
     let g_messages = await get_messages_from_file();
-    g_messages = g_messages.filter(message => message.send_from === req.user.id );
+    g_messages = g_messages.filter(message => message.send_to === req.user.id);
+    g_messages = await Promise.all(g_messages.map(async (message) => {
+        let user = await get_user_by_id(message.send_from);
+        message.send_from = user.name;
+        user = await get_user_by_id(message.send_to);
+        message.send_to = user.name;
+        return message;
+    }));
     res.json({ g_messages });
     
 }

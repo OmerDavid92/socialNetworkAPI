@@ -6,6 +6,8 @@ export default class Navbar extends React.Component {
         this.state = {
             isAdmin: this.setIsAdmin()
         }
+
+        this.handle_click_logout = this.handle_click_logout.bind( this );
     };
 
     setIsAdmin() {
@@ -13,9 +15,9 @@ export default class Navbar extends React.Component {
         return temp[1];
 	}
 
-    handle_click_homepage() {
-        
-
+    handle_click_logout() {
+        document.cookie = "";
+        this.props.logout();
     }
 
 
@@ -24,6 +26,7 @@ export default class Navbar extends React.Component {
             <button id="homepage" onClick={this.props.toHomepage}>homepage</button>
             <button id="messages" onClick={this.props.toMessages}>messages</button> 
             <button id="about" onClick={this.props.toAbout}>about</button>
+            <button id="logout" onClick={this.handle_click_logout}>logout</button>
         </div>
     }
 }

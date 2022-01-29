@@ -5,10 +5,16 @@ const STATUS = require('./user-status');
 const config = require('./config');
 const auth_token = require('./user-token');
 const { get_posts_from_file, update_posts } = require('./db-interface/posts-db-interface'); 
+const { get_user_by_id } = require('./db-interface/users-db-interface');
 
 /////////////////////////////////////////////////////////////////
 async function list_posts( req, res) {
 	let g_posts = await get_posts_from_file();
+    g_posts = await Promise.all(g_posts.map(async (post) => {
+        let user = await get_user_by_id(post.creator_id);
+        post.creator_id = user.name;
+        return post;
+    }));
 	res.json({g_posts});
 }
 
