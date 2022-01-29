@@ -38,7 +38,10 @@ export default class Login extends React.Component
         });
         if (res.status != 200) throw new Error('Error while login');
         res = await res.json();
-       // if (res.token){ console.log(token) }; // To save in a cookie
+        if (res.token) {
+            document.cookie = res.token + ";" + res.isAdmin + ";";
+            this.props.toHomepage();
+        };
 	}
 
 	render() {
@@ -48,6 +51,7 @@ export default class Login extends React.Component
                     <div>Password: </div> 
                     <input id="password" type="password" value={this.state.pass} onChange={this.handle_change}/>
                     <button id="signin" onClick={this.handle_click}>sign in</button>
+                    <button id="signup" onClick={this.props.loginToSignup}>sign up</button>
 				</div>
 	}
 }

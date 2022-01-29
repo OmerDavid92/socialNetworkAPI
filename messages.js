@@ -9,8 +9,10 @@ const { get_messages_from_file, update_messages } = require('./db-interface/mess
 /////////////////////////////////////////////////////////////////
 
 async function list_messages( req, res) {
-	let g_messages = await get_messages_from_file();
-	res.json({g_messages});
+    let g_messages = await get_messages_from_file();
+    g_messages = g_messages.filter(message => message.send_from === req.user.id );
+    res.json({ g_messages });
+    
 }
 
 async function create_message(req, res) {
@@ -89,6 +91,7 @@ const router = express.Router();
 
 router.post('/message', (req, res, nex) => { auth_token(req, res, nex) }, (req, res) => { create_message(req, res )  } )
 router.post('/messages', (req, res, nex) => { auth_token(req, res, nex) }, (req, res) => { send_to_all(req, res )  } )
+router.get('/getMessages', (req, res, nex) => { auth_token(req, res, nex) }, (req, res) => { list_messages(req, res )  } )
 
 
 module.exports = router;

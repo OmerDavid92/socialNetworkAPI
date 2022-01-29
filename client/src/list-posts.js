@@ -18,11 +18,17 @@ export default class ListPosts extends React.Component {
 		this.setState({ g_posts: posts.g_posts });
     }
     
+    getToken() {
+        let temp = document.cookie.split(';');
+        return temp[0];
+    }
+
     async fetch_posts() {
 		let res = await fetch("http://localhost:2718/api/posts", {
             method: 'GET', 
             headers: {
-            'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': "Bearer "+ this.getToken()
             },
         });
         if (res.status != 200) throw new Error('Error while fetching posts');

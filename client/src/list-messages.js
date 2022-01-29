@@ -14,16 +14,22 @@ export default class ListMessages extends React.Component {
         };
     }
 
+    getToken() {
+        let temp = document.cookie.split(';');
+        return temp[0];
+    }
+
     async componentDidMount() {
 		const messages = await this.fetch_messages();
 		this.setState({ messages_array: messages.messages_array });
     }
     
     async fetch_messages() {
-		let res = await fetch("http://localhost:2718/api/messages", {
+		let res = await fetch("http://localhost:2718/api/getMessages", {
             method: 'GET', 
             headers: {
-            'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': "Bearer "+ this.getToken()
             },
         });
         if (res.status != 200) throw new Error('Error while fetching messages');
