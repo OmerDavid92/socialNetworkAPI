@@ -10,7 +10,7 @@ import Navbar from './navbar';
 export default class TheGodFather extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {
+        this.state = JSON.parse(window.localStorage.getItem('state')) || {
             login: true,
             signup: false,
             admin: false,
@@ -27,6 +27,11 @@ export default class TheGodFather extends React.Component {
         this.toHomepage = this.toHomepage.bind(this);
         this.toAbout = this.toAbout.bind(this);
         this.toAdmin = this.toAdmin.bind(this);
+    }
+
+    setState(state) {
+        window.localStorage.setItem('state', JSON.stringify(state));
+        super.setState(state);
     }
 
     loginToSignup() {
