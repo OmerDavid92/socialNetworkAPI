@@ -99,9 +99,9 @@ export default class TheGodFather extends React.Component {
      render() {
         return <div className='theGodFather'>
             {this.state.login ? <Login  loginToSignup={this.loginToSignup} toHomepage={this.toHomepage} ></Login>: null}
-            {this.state.signup ? <Signup signupToHomepage={this.toHomepage}></Signup>: null}
+            {this.state.signup ? <Signup toLogin={this.toLogin}></Signup>: null}
             {this.state.navbar ? <Navbar toHomepage={this.toHomepage} toMessages={this.toMessages} toAbout={this.toAbout} logout={this.toLogin} ></Navbar>: null}
-            {this.state.admin ? <Admin></Admin>: null}
+            {this.state.admin ? <Admin toAdmin={this.toLogin}></Admin>: null}
             {this.state.about ? <About></About>: null}
             {this.state.listPosts ? <ListPosts></ListPosts>: null}
             {this.state.listMessages ? <ListMessages></ListMessages> : null}
