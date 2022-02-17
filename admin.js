@@ -10,7 +10,7 @@ const { get_users_from_file, update_users } = require('./db-interface/users-db-i
 
 async function list_users( req, res) {
 	let g_users = await get_users_from_file();
-	g_users = g_users.map(user => { return {id: user.id, name: user.name, email: user.email, status: user.status}});
+	g_users = g_users.map(user => { return {id: user.id, name: user.name, email: user.email, creation_date: user.creation_date, status: user.status}});
 	res.json({g_users});
 }
 

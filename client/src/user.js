@@ -6,8 +6,8 @@ export default class User extends React.Component {
     }
 
 
+
     render() {
-        if (this.props.status === "created") {
             return <div className='user'>
                 <div>
                     <div>ID:</div>
@@ -23,9 +23,12 @@ export default class User extends React.Component {
                 </div>
                 <div>
                     <div>User creation Date</div>
-                    <div>{this.props.creationDate}</div>
+                    <div>{this.props.creation_date}</div>
+                </div>
+                <div>
+                    <div>User Status</div>
+                    <div>{this.props.status}</div>
                 </div>
             </div>
         }      
-	}
 }

@@ -34,7 +34,8 @@ async function login(req, res) {
 	}
 
 	const token = jwt.sign(user, process.env.ACCESS_TOKEN);
-	res.json({ token });
+	const isAdmin = user.isAdmin;
+	res.json({ token, isAdmin });
 }
 
 async function get_user(req, res) {
@@ -132,7 +133,7 @@ async function create_user(req, res) {
 
 	const new_id = max_id + 1;
 	let creation_date = new Date();
-	let new_user = { id: new_id , name, email, password: enc_password, salt, creation_date, status: STATUS.created};
+	let new_user = { id: new_id , name, email, password: enc_password, salt, creation_date, status: STATUS.created, isAdmin: 'false'};
 	
 	g_users.push(new_user);
 	await update_users(g_users);
