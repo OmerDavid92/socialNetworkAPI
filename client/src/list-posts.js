@@ -27,6 +27,11 @@ export default class ListPosts extends React.Component {
 
     async componentDidMount() {
         const posts = await this.fetch_posts();
+        window.localStorage.setItem('posts_length', JSON.stringify(posts.g_posts.length));
+        if (!window.localStorage.getItem('messages_length')) {
+            const messages = await this.fetch_messages();
+            window.localStorage.setItem('messages_length', JSON.stringify(messages.g_messages.length));
+        }
         this.setState({ g_posts: posts.g_posts });
         this.interval = setInterval(() => {
             this.displayPostButton();
@@ -34,13 +39,12 @@ export default class ListPosts extends React.Component {
         }, 30000);
     }
 
-
     async displayMsgButton() {
         if (this.state.updatedMsg) {
             let prevNumOfMsg = window.localStorage.getItem('messages_length');
             const messages = await this.fetch_messages();
             let new_state = { ...this.state };
-            if (prevNumOfMsg !== messages.g_messages.length) {
+            if (parseInt(prevNumOfMsg) !== messages.g_messages.length) {
                 new_state.updatedMsg = false;
                 this.setState(new_state);
             }
@@ -61,6 +65,7 @@ export default class ListPosts extends React.Component {
 
     async onClickRefreshPost() {
         const posts = await this.fetch_posts();
+        window.localStorage.setItem('posts_length', JSON.stringify(posts.g_posts.length));
         this.setState({ post: this.state.post,updatedMsg: this.state.updatedMsg, updatedPost: true, g_posts: posts.g_posts});
     }
     
@@ -125,6 +130,12 @@ export default class ListPosts extends React.Component {
         this.setState({ post: "", updatedMsg: this.state.updatedMsg, updatedPost: this.state.updatedPost, g_posts: this.state.g_posts});
     }
 
+    async timeStampSort(firstEl, secondEl) {
+        const d1 = new Date(firstEl.creation_date);
+        const d2 = new Date(secondEl.creation_date);
+        return d1.getTime() - d2.getTime();
+    }
+
     componentWillUnmount() {
         clearInterval(this.interval);
     }
@@ -157,7 +168,7 @@ export default class ListPosts extends React.Component {
             >
               New Message!
             </button>
-            {this.state.g_posts.map((item, index) => {
+            {this.state.g_posts.sort(this.timeStampSort).map((item, index) => {
               return (
                 <Post
                   key={index}

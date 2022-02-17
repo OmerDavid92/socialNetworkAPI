@@ -24,21 +24,6 @@ export default class Login extends React.Component
         }
         this.setState(new_state);
     }
-
-  
-  
-  async fetch_messages(token) {
-    let res = await fetch("http://localhost:2718/api/getMessages", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + token
-      },
-    });
-    if (res.status !== 200) throw new Error("Error while fetching messages");
-    res = await res.json();
-    window.localStorage.setItem('messages_length', JSON.stringify(res.g_messages.length));
-  }
   
 
 	async handle_click() {
@@ -53,7 +38,6 @@ export default class Login extends React.Component
     if (res.status != 200) throw new Error('Error while login');
     res = await res.json();
     if (res.token) {
-      this.fetch_messages(res.token);
       document.cookie = `token=${res.token};`;
       document.cookie = `isAdmin=${res.isAdmin};`;
       this.props.toHomepage();

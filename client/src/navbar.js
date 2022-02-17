@@ -17,6 +17,11 @@ export default class Navbar extends React.Component {
 	}
 
     handle_click_logout() {
+        window.localStorage.removeItem('messages_length');
+        window.localStorage.removeItem('posts_length');
+        window.localStorage.removeItem('state');
+        document.cookie = `token=;`;
+        document.cookie = `isAdmin=;`;
         this.props.logout();
     }
 

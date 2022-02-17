@@ -105,7 +105,7 @@ export default class TheGodFather extends React.Component {
             {this.state.admin ? <Admin toAdmin={this.toAdmin}></Admin>: null}
             {this.state.about ? <About></About>: null}
             {this.state.listPosts ? <ListPosts toMessages={this.toMessages}></ListPosts>: null}
-            {this.state.listMessages ? <ListMessages></ListMessages> : null}
+            {this.state.listMessages ? <ListMessages toHomepage={this.toHomepage}></ListMessages> : null}
             
 
         </div>
