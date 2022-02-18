@@ -24,12 +24,12 @@ async function login(req, res) {
 	const { enc_password } = user ? enc_pass(password, user.salt) : { enc_password: null };
 
 	if (!user || user.password !== enc_password) {
-		res.send("Wrong email or password");
+		res.json({ err: "Wrong email or password" });
 		return;
 	}
 
 	if (user.status !== STATUS.active) {
-		res.send("Not an active user");
+		res.json({ err: "Not an active user" });
 		return;
 	}
 

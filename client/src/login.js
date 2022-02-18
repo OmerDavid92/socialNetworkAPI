@@ -4,7 +4,8 @@ export default class Login extends React.Component
 {
 	constructor(props) {
         super(props);
-        this.state = {
+    this.state = {
+            err: '',
             email: '',
             pass: ''
         };
@@ -15,7 +16,7 @@ export default class Login extends React.Component
 
     
     handle_change(event) {
-        let new_state = { email: this.state.email,pass: this.state.pass };
+      let new_state = { err: this.state.err, email: this.state.email, pass: this.state.pass };
         
         if (event.target.id === "email") {
             new_state.email = event.target.value;
@@ -28,7 +29,7 @@ export default class Login extends React.Component
 
 	async handle_click() {
     let data = { email: this.state.email, password: this.state.pass };
-		let res = await fetch("http://localhost:2718/api/login", {
+		let res = await fetch("http://localhost:5000/api/login", {
             method: 'POST', 
             headers: {
             'Content-Type': 'application/json'
@@ -41,12 +42,16 @@ export default class Login extends React.Component
       document.cookie = `token=${res.token};`;
       document.cookie = `isAdmin=${res.isAdmin};`;
       this.props.toHomepage();
-    };
+    }
+    else {
+      let new_state = { err: res.err, email: this.state.email, pass: this.state.pass };
+      this.setState(new_state);
+    }
 	}
 
 	render() {
         return (
-          <div className="login">
+          <div className="login marginLeft">
             <div>Email: </div>
             <input
               id="email"
@@ -61,6 +66,7 @@ export default class Login extends React.Component
               value={this.state.pass}
               onChange={this.handle_change}
             />
+             <p style={{color:"red"}}>{this.state.err}</p>
             <button id="signin" onClick={this.handle_click}>
               sign in
             </button>

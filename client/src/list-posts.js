@@ -36,7 +36,7 @@ export default class ListPosts extends React.Component {
         this.interval = setInterval(() => {
             this.displayPostButton();
             this.displayMsgButton()
-        }, 30000);
+        }, 5000);
     }
 
     async displayMsgButton() {
@@ -76,7 +76,7 @@ export default class ListPosts extends React.Component {
     }
 
     async fetch_messages() {
-        let res = await fetch("http://localhost:2718/api/getMessages", {
+        let res = await fetch("http://localhost:5000/api/getMessages", {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -88,7 +88,7 @@ export default class ListPosts extends React.Component {
     }
 
     async fetch_posts() {
-        let res = await fetch("http://localhost:2718/api/posts", {
+        let res = await fetch("http://localhost:5000/api/posts", {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -117,7 +117,7 @@ export default class ListPosts extends React.Component {
         let data = {
             text: this.state.post
         };
-        let res = await fetch("http://localhost:2718/api/post", {
+        let res = await fetch("http://localhost:5000/api/post", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -130,10 +130,10 @@ export default class ListPosts extends React.Component {
         this.setState({ post: "", updatedMsg: this.state.updatedMsg, updatedPost: this.state.updatedPost, g_posts: this.state.g_posts});
     }
 
-    async timeStampSort(firstEl, secondEl) {
+    timeStampSort(firstEl, secondEl) {
         const d1 = new Date(firstEl.creation_date);
         const d2 = new Date(secondEl.creation_date);
-        return d1.getTime() - d2.getTime();
+        return d2.getTime() - d1.getTime();
     }
 
     componentWillUnmount() {
@@ -142,33 +142,33 @@ export default class ListPosts extends React.Component {
 
     render() {
         return (
-          <div className="lists-posts">
-            <div>Write Post: </div>
-            <textarea
-              id="post"
-              type="text"
-              onChange={this.handle_change}
-              value={this.state.post}
-            />
-            <p></p>
-            <button id="sendPost" onClick={this.handle_click}>
-              Post
-            </button>
-            <button
-              id="refreshPosts"
-              hidden={this.state.updatedPost}
-              onClick={this.onClickRefreshPost}
+          <div className="lists-posts marginLeft marginTop">
+            <div className="marginLeft marginTop">Write Post: </div>
+                <div><textarea
+                className="marginLeft"
+                id="post"
+                type="text"
+                onChange={this.handle_change}
+                value={this.state.post}
+                /></div>
+            <div><button className="marginLeft marginBottom" id="sendPost" onClick={this.handle_click}>
+                Post
+            </button></div>
+            <button className="marginLeft marginBottom"
+                id="refreshPosts"
+                hidden={this.state.updatedPost}
+                onClick={this.onClickRefreshPost}
             >
               New Post!
                 </button>
-                <button
+                <button className="marginLeft marginBottom"
               id="refreshMsg"
               hidden={this.state.updatedMsg}
               onClick={this.props.toMessages}
             >
               New Message!
             </button>
-            {this.state.g_posts.sort(this.timeStampSort).map((item, index) => {
+            {this.state.g_posts.sort(this.timeStampSort).slice(0,10).map((item, index) => {
               return (
                 <Post
                   key={index}

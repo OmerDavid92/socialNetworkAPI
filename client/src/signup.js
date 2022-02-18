@@ -32,7 +32,7 @@ export default class Signup extends React.Component
 	async handle_click() {
         let data = { name: this.state.name, email: this.state.email, password: this.state.pass };
         //console.log({state: this.state})
-		let res = await fetch("http://localhost:2718/api/users", {
+		let res = await fetch("http://localhost:5000/api/users", {
             method: 'POST', 
             headers: {
             'Content-Type': 'application/json'

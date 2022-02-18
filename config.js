@@ -1,5 +1,5 @@
 let config = {
-    port: 2718,
+    port: 5000,
     usersPath: 'users.json',
     postsPath: 'posts.json',
     messagesPath: 'messages.json',

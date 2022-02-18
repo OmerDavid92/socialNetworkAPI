@@ -8,26 +8,21 @@ export default class User extends React.Component {
 
 
     render() {
-            return <div className='user'>
-                <div>
-                    <div>ID:</div>
-                    <div>{this.props.id}</div>
+            return <div className='marginTop'>
+                <div className='marginLeft'>
+                    <div>ID: {this.props.id}</div>
                 </div>
-                <div>
-                    <div>Name:</div>
-                    <div>{this.props.name}</div>
+                <div className='marginLeft'>
+                    <div>Name: {this.props.name}</div>
                 </div>
-                <div>
-                    <div>Email:</div>
-                    <div>{this.props.email}</div>
+                <div className='marginLeft'>
+                    <div>Email: {this.props.email}</div>
                 </div>
-                <div>
-                    <div>User creation Date</div>
-                    <div>{this.props.creation_date}</div>
+                <div className='marginLeft'>
+                    <div>User creation Date: {this.props.creation_date}</div>
                 </div>
-                <div>
-                    <div>User Status</div>
-                    <div>{this.props.status}</div>
+                <div className='marginLeft'>
+                    <div>User Status: {this.props.status}</div>
                 </div>
             </div>
         }      

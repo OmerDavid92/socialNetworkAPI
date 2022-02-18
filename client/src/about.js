@@ -7,8 +7,13 @@ export default class About extends React.Component {
 
 
 	render() {
-        return <div className='about'>
-                        <div>aboutttttttttttttttt</div>
-				</div>
+        return <div className='marginTop marginLeft'>
+                    <p> Name: Raziel Alron </p>
+                    <p> ID: 316061415 </p>
+                    <p> Name: Omer David </p>
+                    <p> ID: 308483437 </p>
+                    <p> Omer+Razi = ❤️4Ever </p>
+
+			    </div>
 	}
 }

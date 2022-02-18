@@ -28,7 +28,7 @@ export default class Navbar extends React.Component {
 
     render() {
         this.state.isAdmin = this.setIsAdmin();
-        return <div className='navbar'>
+        return <div className='marginTop marginLeft'>
                 <button id="homepage" onClick={this.props.toHomepage}>homepage</button>
                 <button id="messages" onClick={this.props.toMessages}>messages</button>
                 <button id="about" onClick={this.props.toAbout}>about</button>

@@ -16,7 +16,8 @@ export default class ListMessages extends React.Component {
         },
       ],
     };
-
+    
+    this.displayPostButton();
     this.displayMsgButton = this.displayMsgButton.bind(this);
     this.displayPostButton = this.displayPostButton.bind(this);
     this.onClickRefreshMsg = this.onClickRefreshMsg.bind(this);
@@ -38,12 +39,12 @@ export default class ListMessages extends React.Component {
     this.setState({ g_messages: messages.g_messages });
     this.interval = setInterval(() => {
       this.displayPostButton();
-      this.displayMsgButton()
+      this.displayMsgButton();
     }, 5000);
   }
 
   async fetch_messages() {
-    let res = await fetch("http://localhost:2718/api/getMessages", {
+    let res = await fetch("http://localhost:5000/api/getMessages", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -55,7 +56,7 @@ export default class ListMessages extends React.Component {
   }
 
   async fetch_posts() {
-    let res = await fetch("http://localhost:2718/api/posts", {
+    let res = await fetch("http://localhost:5000/api/posts", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -68,7 +69,7 @@ export default class ListMessages extends React.Component {
 
   async displayPostButton() {
     if (this.state.updatedPost) {
-      let prevNumOfPost = window.localStorage.getItem('post_length');
+      let prevNumOfPost = window.localStorage.getItem('posts_length');
       const posts = await this.fetch_posts();
       let new_state = { ...this.state };
       if (parseInt(prevNumOfPost) !== posts.g_posts.length) {
@@ -96,29 +97,35 @@ export default class ListMessages extends React.Component {
     this.setState({ updatedPost: this.state.updatedPost, updatedMsg: true, g_messages: messages.g_messages });
   }
 
-  async timeStampSort(firstEl, secondEl) {
-    return secondEl.creation_date - firstEl.creation_date;
+  timeStampSort(firstEl, secondEl) {
+        const d1 = new Date(firstEl.creation_date);
+        const d2 = new Date(secondEl.creation_date);
+        return d2.getTime() - d1.getTime();
+  }
+  
+  componentWillUnmount() {
+    clearInterval(this.interval);
   }
 
 
   render() {
     return (
-      <div className="list-massages">
-         <button
+      <div className="list-massages marginLeft">
+         <button className="marginLeft marginBottom marginTop"
               id="refreshPosts"
               hidden={this.state.updatedPost}
               onClick={this.props.toHomepage}
             >
               New Post!
                 </button>
-                <button
+                <button className="marginLeft marginBottom marginTop"
               id="refreshMsg"
               hidden={this.state.updatedMsg}
               onClick={this.onClickRefreshMsg}
             >
               New Message!
             </button>
-        {this.state.g_messages.sort(this.timeStampSort).map((item, index) => {
+        {this.state.g_messages.sort(this.timeStampSort).slice(0,10).map((item, index) => {
           return (
             <div key={index}>
               <Message

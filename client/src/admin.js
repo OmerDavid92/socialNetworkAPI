@@ -5,6 +5,7 @@ export default class Admin extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      message: "",
       g_users: [
         {
           id: "",
@@ -19,6 +20,8 @@ export default class Admin extends React.Component {
     this.handle_click_delete = this.handle_click_delete.bind(this);
     this.handle_click_suspend = this.handle_click_suspend.bind(this);
     this.handle_click_restore = this.handle_click_restore.bind(this);
+    this.handle_change = this.handle_change.bind(this);
+    this.handle_click = this.handle_click.bind(this);
   }
 
   getToken() {
@@ -33,7 +36,7 @@ export default class Admin extends React.Component {
   }
 
   async fetch_users() {
-    let res = await fetch("http://localhost:2718/admin/users", {
+    let res = await fetch("http://localhost:5000/admin/users", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -54,7 +57,7 @@ export default class Admin extends React.Component {
 
   async handle_click_approve(id) {
     console.log(id);
-    let res = await fetch("http://localhost:2718/admin/approve/" + id, {
+    let res = await fetch("http://localhost:5000/admin/approve/" + id, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -68,7 +71,7 @@ export default class Admin extends React.Component {
 
   async handle_click_delete(id) {
     console.log(id);
-    let res = await fetch("http://localhost:2718/admin/delete/" + id, {
+    let res = await fetch("http://localhost:5000/admin/delete/" + id, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -82,7 +85,7 @@ export default class Admin extends React.Component {
 
   async handle_click_suspend(id) {
     console.log(id);
-    let res = await fetch("http://localhost:2718/admin/suspend/" + id, {
+    let res = await fetch("http://localhost:5000/admin/suspend/" + id, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -96,7 +99,7 @@ export default class Admin extends React.Component {
 
   async handle_click_restore(id) {
     console.log(id);
-    let res = await fetch("http://localhost:2718/admin/restore/" + id, {
+    let res = await fetch("http://localhost:5000/admin/restore/" + id, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -108,12 +111,51 @@ export default class Admin extends React.Component {
     this.updateStatus(res);
   }
 
+  handle_change(event) {
+    let new_state = {
+      message: this.state.post,
+      g_users: this.state.g_users
+    };
+
+    if (event.target.id === "message") {
+      new_state.message = event.target.value;
+    }
+    this.setState(new_state);
+  }
+
+  async handle_click() {
+    let data = {
+      text: this.state.message
+    };
+    let res = await fetch("http://localhost:5000/api/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + this.getToken()
+      },
+      body: JSON.stringify(data),
+    });
+    if (res.status != 200) throw new Error("Error while sending");
+    res = await res.json();
+    this.setState({ message: "", g_users: this.state.g_users });
+  }
+
   render() {
     return (
-      <div className="admin">
+      <div>
+        <div className='marginLeft marginTop'>Write Message to all users: </div>
+        <div><textarea className='marginLeft marginTop'
+              id="message"
+              type="text"
+              onChange={this.handle_change}
+              value={this.state.message}
+          /></div>
+        <div> <button className='marginLeft marginBottom' id="sendMsg" onClick={this.handle_click}>
+              Send Message
+        </button></div>
         {this.state.g_users.map((item, index) => {
           return (
-            <div key={index}>
+            <div className='item' key={index}>
               <User
                 id={item.id}
                 name={item.name}
@@ -121,26 +163,26 @@ export default class Admin extends React.Component {
                 creation_date={item.creation_date}
                 status={item.status}
               ></User>
-              <button
+              <button className='marginLeft marginTop marginBottom2'
                 disabled={item.status !== "created"}
                 id="approve"
                 onClick={() => this.handle_click_approve(item.id)}
               >
                 Approve
               </button>
-              <button
+              <button className='marginLeft marginTop marginBottom2'
                 disabled={item.status === "deleted"}
                 id="delete"
                 onClick={() => this.handle_click_delete(item.id)}
               >Delete
               </button>
-              <button
+              <button className='marginLeft marginTop marginBottom2'
                 disabled={item.status !== "active"}
                 id="suspend"
                 onClick={() => this.handle_click_suspend(item.id)}
               >Suspend
               </button>
-              <button
+              <button className='marginLeft marginTop marginBottom2'
                 disabled={
                   item.status !== "suspended"
                 }
@@ -148,7 +190,6 @@ export default class Admin extends React.Component {
                 onClick={() => this.handle_click_restore(item.id)}
               >Restore
               </button>
-              <p></p>
             </div>
           );
         })}
