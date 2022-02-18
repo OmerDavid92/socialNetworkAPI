@@ -1,5 +1,5 @@
 Date: 1/1/2022
-Name of the exercise: Exercise 2 in JS Course
+Name of the exercise: Exercise 2+3 in JS Course
 Full Name: Raziel Alron
 ID Number: 316061415
 Email address: razielal@mta.ac.il
@@ -7,11 +7,22 @@ Full Name: Omer David
 ID Number: 308483437
 Email address: omerdavid1992@gmail.com
 
+# Client code
+The client code (ex3) is at ./client
 
-הסבר מדוע השתמשנו בחבילה jsonwebtoken:
-על מנת לאמת את בקשות הלקוח, בחרנו להשתמש בחבילה בשם jsonwebtoken
-חבילה זו מספקת לנו החתמה של מידע אודות המשתמש המחובר.
-החתימה היא בעצם הצפנת המידע ע"י פונקציית האש באמצעות מפתח אישי שנשמר על השרת בלבד.
-מידע מוצפן זה מועבר ללקוח אשר משתמש בו לכל בקשה שהוא רוצה לבצע וכך נוכל לאמת משתמש זה.
-אנו מודעים לסיכון שאנו שומרים בצופן זה מידע אודות המשתמש, דבר שנהוג לעשות רק על השרת ולא בצד הלקוח אך מידע זה לא רגיש.
-נוסיף ונאמר שלא ניתן לשנות צופן זה שכן כל שינוי ישפיע על החתימה של הצופן שמוטבעת באמצעות המפתח היחודי ששמור על השרת.
+# Installation
+Run these commands:
+1. npm install
+2. cd client
+3. npm install
+
+# Run
+At the root directory, run these commands in 2 different terminals:
+1. npm run server
+2. npm run client
+
+# Data
+If you want to delete all data you can delete the files at the root directory:
+1. posts.json
+2. messages.json
+3. users.json
