@@ -24,6 +24,16 @@ export default class Admin extends React.Component {
     this.handle_click = this.handle_click.bind(this);
   }
 
+  getDisplayedTime(ts) {
+    if (!ts.getTime()) return 'No Date';
+
+    let hour = ts.getHours() < 10 ? `0${ts.getHours()}` : ts.getHours();
+    let min = ts.getMinutes() < 10 ? `0${ts.getMinutes()}` : ts.getMinutes();
+    let sec = ts.getSeconds() < 10 ? `0${ts.getSeconds()}` : ts.getSeconds();
+
+    return `${ts.getDate()}/${(ts.getMonth() + 1)}/${ts.getFullYear()} ${hour}:${min}:${sec}`;
+  }
+
   getToken() {
     let tokenCookie = document.cookie.split("token=")[1];
     return tokenCookie.split(";")[0];
@@ -145,13 +155,13 @@ export default class Admin extends React.Component {
       <div>
         <div className='marginLeft marginTop'>Write Message to all users: </div>
         <div><textarea className='marginLeft marginTop'
-              id="message"
-              type="text"
-              onChange={this.handle_change}
-              value={this.state.message}
-          /></div>
+          id="message"
+          type="text"
+          onChange={this.handle_change}
+          value={this.state.message}
+        /></div>
         <div> <button className='marginLeft marginBottom' id="sendMsg" onClick={this.handle_click}>
-              Send Message
+          Send Message
         </button></div>
         {this.state.g_users.map((item, index) => {
           return (
@@ -160,7 +170,7 @@ export default class Admin extends React.Component {
                 id={item.id}
                 name={item.name}
                 email={item.email}
-                creation_date={item.creation_date}
+                creation_date={this.getDisplayedTime(new Date(item.creation_date))}
                 status={item.status}
               ></User>
               <button className='marginLeft marginTop marginBottom2'

@@ -16,11 +16,21 @@ export default class ListMessages extends React.Component {
         },
       ],
     };
-    
+
     this.displayPostButton();
     this.displayMsgButton = this.displayMsgButton.bind(this);
     this.displayPostButton = this.displayPostButton.bind(this);
     this.onClickRefreshMsg = this.onClickRefreshMsg.bind(this);
+  }
+
+  getDisplayedTime(ts) {
+    if (!ts.getTime()) return 'No Date';
+
+    let hour = ts.getHours() < 10 ? `0${ts.getHours()}` : ts.getHours();
+    let min = ts.getMinutes() < 10 ? `0${ts.getMinutes()}` : ts.getMinutes();
+    let sec = ts.getSeconds() < 10 ? `0${ts.getSeconds()}` : ts.getSeconds();
+
+    return `${ts.getDate()}/${(ts.getMonth() + 1)}/${ts.getFullYear()} ${hour}:${min}:${sec}`;
   }
 
   getToken() {
@@ -98,11 +108,11 @@ export default class ListMessages extends React.Component {
   }
 
   timeStampSort(firstEl, secondEl) {
-        const d1 = new Date(firstEl.creation_date);
-        const d2 = new Date(secondEl.creation_date);
-        return d2.getTime() - d1.getTime();
+    const d1 = new Date(firstEl.creation_date);
+    const d2 = new Date(secondEl.creation_date);
+    return d2.getTime() - d1.getTime();
   }
-  
+
   componentWillUnmount() {
     clearInterval(this.interval);
   }
@@ -111,27 +121,27 @@ export default class ListMessages extends React.Component {
   render() {
     return (
       <div className="list-massages marginLeft">
-         <button className="marginLeft marginBottom marginTop"
-              id="refreshPosts"
-              hidden={this.state.updatedPost}
-              onClick={this.props.toHomepage}
-            >
-              New Post!
-                </button>
-                <button className="marginLeft marginBottom marginTop"
-              id="refreshMsg"
-              hidden={this.state.updatedMsg}
-              onClick={this.onClickRefreshMsg}
-            >
-              New Message!
-            </button>
-        {this.state.g_messages.sort(this.timeStampSort).slice(0,10).map((item, index) => {
+        <button className="marginLeft marginBottom marginTop"
+          id="refreshPosts"
+          hidden={this.state.updatedPost}
+          onClick={this.props.toHomepage}
+        >
+          New Post!
+        </button>
+        <button className="marginLeft marginBottom marginTop"
+          id="refreshMsg"
+          hidden={this.state.updatedMsg}
+          onClick={this.onClickRefreshMsg}
+        >
+          New Message!
+        </button>
+        {this.state.g_messages.sort(this.timeStampSort).slice(0, 10).map((item, index) => {
           return (
             <div key={index}>
               <Message
                 sendFrom={item.send_from}
                 sendTo={item.send_to}
-                creationDate={item.creation_date}
+                creationDate={this.getDisplayedTime(new Date(item.creation_date))}
                 text={item.text}
               ></Message>
             </div>

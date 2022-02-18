@@ -5,7 +5,7 @@ import Post from './post';
 export default class ListPosts extends React.Component {
     constructor(props) {
         super(props);
-        this.interval='';
+        this.interval = '';
         this.state = {
             post: "",
             updatedMsg: true,
@@ -23,6 +23,16 @@ export default class ListPosts extends React.Component {
         this.onClickRefreshPost = this.onClickRefreshPost.bind(this);
         this.handle_change = this.handle_change.bind(this);
         this.handle_click = this.handle_click.bind(this);
+    }
+
+    getDisplayedTime(ts) {
+        if (!ts.getTime()) return 'No Date';
+
+        let hour = ts.getHours() < 10 ? `0${ts.getHours()}` : ts.getHours();
+        let min = ts.getMinutes() < 10 ? `0${ts.getMinutes()}` : ts.getMinutes();
+        let sec = ts.getSeconds() < 10 ? `0${ts.getSeconds()}` : ts.getSeconds();
+
+        return `${ts.getDate()}/${(ts.getMonth() + 1)}/${ts.getFullYear()} ${hour}:${min}:${sec}`;
     }
 
     async componentDidMount() {
@@ -66,9 +76,9 @@ export default class ListPosts extends React.Component {
     async onClickRefreshPost() {
         const posts = await this.fetch_posts();
         window.localStorage.setItem('posts_length', JSON.stringify(posts.g_posts.length));
-        this.setState({ post: this.state.post,updatedMsg: this.state.updatedMsg, updatedPost: true, g_posts: posts.g_posts});
+        this.setState({ post: this.state.post, updatedMsg: this.state.updatedMsg, updatedPost: true, g_posts: posts.g_posts });
     }
-    
+
 
     getToken() {
         let tokenCookie = document.cookie.split("token=")[1];
@@ -127,7 +137,9 @@ export default class ListPosts extends React.Component {
         });
         if (res.status != 200) throw new Error("Error while login");
         res = await res.json();
-        this.setState({ post: "", updatedMsg: this.state.updatedMsg, updatedPost: this.state.updatedPost, g_posts: this.state.g_posts});
+        let posts = await this.fetch_posts();
+        window.localStorage.setItem('posts_length', JSON.stringify(posts.g_posts.length));
+        this.setState({ post: "", updatedMsg: this.state.updatedMsg, updatedPost: this.state.updatedPost, g_posts: posts.g_posts });
     }
 
     timeStampSort(firstEl, secondEl) {
@@ -142,43 +154,43 @@ export default class ListPosts extends React.Component {
 
     render() {
         return (
-          <div className="lists-posts marginLeft marginTop">
-            <div className="marginLeft marginTop">Write Post: </div>
+            <div className="lists-posts marginLeft marginTop">
+                <div className="marginLeft marginTop">Write Post: </div>
                 <div><textarea
-                className="marginLeft"
-                id="post"
-                type="text"
-                onChange={this.handle_change}
-                value={this.state.post}
+                    className="marginLeft"
+                    id="post"
+                    type="text"
+                    onChange={this.handle_change}
+                    value={this.state.post}
                 /></div>
-            <div><button className="marginLeft marginBottom" id="sendPost" onClick={this.handle_click}>
-                Post
-            </button></div>
-            <button className="marginLeft marginBottom"
-                id="refreshPosts"
-                hidden={this.state.updatedPost}
-                onClick={this.onClickRefreshPost}
-            >
-              New Post!
+                <div><button className="marginLeft marginBottom" id="sendPost" onClick={this.handle_click}>
+                    Post
+                </button></div>
+                <button className="marginLeft marginBottom"
+                    id="refreshPosts"
+                    hidden={this.state.updatedPost}
+                    onClick={this.onClickRefreshPost}
+                >
+                    New Post!
                 </button>
                 <button className="marginLeft marginBottom"
-              id="refreshMsg"
-              hidden={this.state.updatedMsg}
-              onClick={this.props.toMessages}
-            >
-              New Message!
-            </button>
-            {this.state.g_posts.sort(this.timeStampSort).slice(0,10).map((item, index) => {
-              return (
-                <Post
-                  key={index}
-                  name={item.creator_id}
-                  creationDate={item.creation_date}
-                  text={item.text}
-                ></Post>
-              );
-            })}
-          </div>
+                    id="refreshMsg"
+                    hidden={this.state.updatedMsg}
+                    onClick={this.props.toMessages}
+                >
+                    New Message!
+                </button>
+                {this.state.g_posts.sort(this.timeStampSort).slice(0, 10).map((item, index) => {
+                    return (
+                        <Post
+                            key={index}
+                            name={item.creator_id}
+                            creationDate={this.getDisplayedTime(new Date(item.creation_date))}
+                            text={item.text}
+                        ></Post>
+                    );
+                })}
+            </div>
         );
     }
 }
