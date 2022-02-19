@@ -42,10 +42,11 @@ export default class ListPosts extends React.Component {
             const messages = await this.fetch_messages();
             window.localStorage.setItem('messages_length', JSON.stringify(messages.g_messages.length));
         }
+        this.displayMsgButton();
         this.setState({ g_posts: posts.g_posts });
         this.interval = setInterval(() => {
             this.displayPostButton();
-            this.displayMsgButton()
+            this.displayMsgButton();
         }, 5000);
     }
 
