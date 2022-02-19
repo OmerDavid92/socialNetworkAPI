@@ -48,12 +48,12 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:2718/api/users",
+					"raw": "http://localhost:5000/api/users",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "2718",
+					"port": "5000",
 					"path": [
 						"api",
 						"users"
@@ -105,12 +105,12 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:2718/api/login",
+					"raw": "http://localhost:5000/api/login",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "2718",
+					"port": "5000",
 					"path": [
 						"api",
 						"login"
@@ -147,12 +147,12 @@
 					}
 				],
 				"url": {
-					"raw": "http://localhost:2718/admin/approve/{{id1}}",
+					"raw": "http://localhost:5000/admin/approve/{{id1}}",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "2718",
+					"port": "5000",
 					"path": [
 						"admin",
 						"approve",
@@ -193,12 +193,12 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:2718/api/login",
+					"raw": "http://localhost:5000/api/login",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "2718",
+					"port": "5000",
 					"path": [
 						"api",
 						"login"
@@ -253,12 +253,12 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:2718/api/message",
+					"raw": "http://localhost:5000/api/message",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "2718",
+					"port": "5000",
 					"path": [
 						"api",
 						"message"
@@ -314,12 +314,12 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:2718/api/post",
+					"raw": "http://localhost:5000/api/post",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "2718",
+					"port": "5000",
 					"path": [
 						"api",
 						"post"
@@ -375,12 +375,12 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:2718/api/post",
+					"raw": "http://localhost:5000/api/post",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "2718",
+					"port": "5000",
 					"path": [
 						"api",
 						"post"
@@ -417,12 +417,12 @@
 					}
 				],
 				"url": {
-					"raw": "http://localhost:2718/api/posts",
+					"raw": "http://localhost:5000/api/posts",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "2718",
+					"port": "5000",
 					"path": [
 						"api",
 						"posts"
@@ -458,12 +458,12 @@
 					}
 				],
 				"url": {
-					"raw": "http://localhost:2718/api/post/{{post1id}}",
+					"raw": "http://localhost:5000/api/post/{{post1id}}",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "2718",
+					"port": "5000",
 					"path": [
 						"api",
 						"post",
@@ -498,12 +498,12 @@
 					}
 				],
 				"url": {
-					"raw": "http://localhost:2718/api/post/{{post2id}}",
+					"raw": "http://localhost:5000/api/post/{{post2id}}",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "2718",
+					"port": "5000",
 					"path": [
 						"api",
 						"post",
@@ -542,12 +542,12 @@
 					}
 				],
 				"url": {
-					"raw": "http://localhost:2718/admin/suspend/{{id1}}",
+					"raw": "http://localhost:5000/admin/suspend/{{id1}}",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "2718",
+					"port": "5000",
 					"path": [
 						"admin",
 						"suspend",
@@ -595,12 +595,12 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:2718/api/login",
+					"raw": "http://localhost:5000/api/login",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "2718",
+					"port": "5000",
 					"path": [
 						"api",
 						"login"
@@ -647,12 +647,12 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:2718/api/users",
+					"raw": "http://localhost:5000/api/users",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "2718",
+					"port": "5000",
 					"path": [
 						"api",
 						"users"
@@ -704,12 +704,12 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:2718/api/users",
+					"raw": "http://localhost:5000/api/users",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "2718",
+					"port": "5000",
 					"path": [
 						"api",
 						"users"
@@ -755,12 +755,12 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:2718/api/messages",
+					"raw": "http://localhost:5000/api/messages",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "2718",
+					"port": "5000",
 					"path": [
 						"api",
 						"messages"

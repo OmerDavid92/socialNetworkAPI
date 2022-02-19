@@ -24,17 +24,18 @@ async function login(req, res) {
 	const { enc_password } = user ? enc_pass(password, user.salt) : { enc_password: null };
 
 	if (!user || user.password !== enc_password) {
-		res.send("Wrong email or password");
+		res.json({ err: "Wrong email or password" });
 		return;
 	}
 
 	if (user.status !== STATUS.active) {
-		res.send("Not an active user");
+		res.json({ err: "Not an active user" });
 		return;
 	}
 
 	const token = jwt.sign(user, process.env.ACCESS_TOKEN);
-	res.json({ token });
+	const isAdmin = user.isAdmin;
+	res.json({ token, isAdmin });
 }
 
 async function get_user(req, res) {
@@ -132,7 +133,7 @@ async function create_user(req, res) {
 
 	const new_id = max_id + 1;
 	let creation_date = new Date();
-	let new_user = { id: new_id , name, email, password: enc_password, salt, creation_date, status: STATUS.created};
+	let new_user = { id: new_id , name, email, password: enc_password, salt, creation_date, status: STATUS.created, isAdmin: 'false'};
 	
 	g_users.push(new_user);
 	await update_users(g_users);

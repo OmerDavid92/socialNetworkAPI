@@ -43,7 +43,6 @@ async function create_post(req, res) {
 	const new_id = max_id + 1;
 	let creation_date = new Date();
 	const new_post = { id: new_id , text, creation_date, creator_id: req.user.id};
-	
 	g_posts.push(new_post);
 	await update_posts(g_posts);
 	res.json({id: new_id});   

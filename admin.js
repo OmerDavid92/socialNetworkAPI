@@ -10,6 +10,14 @@ const { get_users_from_file, update_users } = require('./db-interface/users-db-i
 
 async function list_users( req, res) {
 	let g_users = await get_users_from_file();
+	g_users = g_users.map(user => { return {id: user.id, name: user.name, email: user.email, creation_date: user.creation_date, status: user.status}});
+	res.json({g_users});
+}
+
+async function list_users_by_status(req, res) {
+    const status = parseInt(req.params.status);
+	let g_users = await get_users_from_file();
+	g_users = g_users.filter(user => user.status === status);
 	g_users = g_users.map(user => { return {id: user.id, name: user.name, email: user.email, status: user.status}});
 	res.json({g_users});
 }
@@ -54,6 +62,7 @@ async function update_status(req, res, from_status, to_status) {
 const router = express.Router();
 
 router.get('/users', (req, res, nex) => { auth_token(req, res, nex) }, (req, res) => { list_users(req, res )  } )
+router.get('/users_status/(:status)', (req, res, nex) => { auth_token(req, res, nex) }, (req, res) => { list_users_by_status(req, res )  } )
 router.put('/approve/(:id)', (req, res, nex) => { auth_token(req, res, nex) }, (req, res) => { update_status(req, res, STATUS.created, STATUS.active) } )
 router.put('/suspend/(:id)', (req, res, nex) => { auth_token(req, res, nex) }, (req, res) => { update_status(req, res, STATUS.active, STATUS.suspended) } )
 router.put('/restore/(:id)', (req, res, nex) => { auth_token(req, res, nex) }, (req, res) => { update_status(req, res, STATUS.suspended, STATUS.active) } )

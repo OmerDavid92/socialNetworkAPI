@@ -7,20 +7,20 @@ export default class Messages extends React.Component {
 
 
 	render() {
-        return <div className='message'>
-                    <div>
-                        <div>Message sender:</div>
-                        <div>{this.props.sendFrom}</div>
+        return <div className='item'>
+                    <div className='marginLeft'>
+                        <div>Message sender: {this.props.sendFrom}</div>
                     </div>
-                    <div>
-                        <div>Message receiver:</div>
-                        <div>{this.props.sendTo}</div>
+                    <div className='marginLeft'>
+                        <div>Message receiver: {this.props.sendTo}</div>
                     </div>
-                    <div>
-                        <div>Message creation Date</div>
-                        <div>{this.props.creationDate}</div>   
+                    <div className='marginLeft'>
+                        <div>Message creation Date: {this.props.creationDate}</div>
                     </div>
-                    <p> {this.props.text} </p> 
+                    <div className='marginLeft'>
+                        <div>Message:</div>
+                        <p> {this.props.text} </p> 
+                    </div>
 				</div>
 	}
 }
